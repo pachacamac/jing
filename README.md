@@ -47,6 +47,8 @@ Serves the current project folder on `http://0.0.0.0:8000`:
     
     $ jing serve
 
+File endings work like Russian dolls: They get converted from outer to inner. Rails folks should be somewhat familiar with that but here it's a bit stricter.
+
 Folders starting with `_` have special meaning, they generally won't get copied into the destination folder `_dst`.
 
 `_partials` holds partials (TODO: explanation)
@@ -55,8 +57,7 @@ Folders starting with `_` have special meaning, they generally won't get copied 
 
 `.meta.yml` holds global meta variables available in templates when not overwritten
 
-I'll try and add a basic example project soon. If you feel like wanting to giving this a try in the meantime feel free to open an issue or reach out otherwise.
-
+~~I'll try and add a basic example project soon.~~ Check out the examples folder. If you feel like giving this a try and have questions feel free to open an issue or reach out otherwise. Pull requests welcome too.
 
 ## Development
 
