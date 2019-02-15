@@ -5,6 +5,10 @@ A tiny static site generator packing a punch
 Jing tai wang ye sheng cheng qi
 静态网页生成器
 
+---
+
+Has built in support for Erb - and Markdown templates, Typescript compiler, Sass compiler, JavaScript/Css minifier, partial- and layout support, variable support, easily extendable.
+
 ## Installation
 
 Add this line to your application's Gemfile:
