@@ -25,9 +25,34 @@ Or install it yourself as:
 
 call `jing` on the command line or have a look at the code (it's tiny) :)
 
-   $ jing create mypage
-   $ jing build # or jing watch
-   $ jing serve
+
+Creates a new folder `mypage` with a basic setup:
+
+    $ jing create mypage
+    $ cd mypage
+    
+Build the current project:
+    
+    $ jing build
+    
+Automatically build the page whenever a file in the project folder changes:
+
+    $ jing watch
+    
+Serves the current project folder on `http://0.0.0.0:8000`:
+    
+    $ jing serve
+
+Folders starting with `_` have special meaning, they generally won't get copied into the destination folder `_dst`.
+
+`_partials` holds partials (TODO: explanation)
+
+`_layouts` holds layouts (TODO: explanation)
+
+`.meta.yml` holds global meta variables available in templates when not overwritten
+
+I'll try and add a basic example project soon. If you feel like wanting to giving this a try in the meantime feel free to open an issue or reach out otherwise.
+
 
 ## Development
 
