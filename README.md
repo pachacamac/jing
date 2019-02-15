@@ -25,6 +25,10 @@ Or install it yourself as:
 
 call `jing` on the command line or have a look at the code (it's tiny) :)
 
+   $ jing create mypage
+   $ jing build # or jing watch
+   $ jing serve
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
