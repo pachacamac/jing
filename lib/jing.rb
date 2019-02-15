@@ -1,5 +1,7 @@
 require "jing/version"
 
+%w[erb yaml fileutils time webrick ostruct bundler/inline].each { |e| require e }
+
 module Jing
   class Jing
     attr_accessor :converters, :converter_extensions

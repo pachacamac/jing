@@ -2,6 +2,9 @@
 
 A tiny static site generator packing a punch
 
+Jing tai wang ye sheng cheng qi
+静态网页生成器
+
 ## Installation
 
 Add this line to your application's Gemfile:
