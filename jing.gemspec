@@ -6,10 +6,10 @@ Gem::Specification.new do |spec|
   spec.name          = "jing"
   spec.version       = Jing::VERSION
   spec.authors       = ["pachacamac"]
-  spec.email         = ["marcanbe@gmail.com"]
+  spec.email         = ["pachacamac@inboxalias.com"]
 
-  spec.summary       = %q{A tiny static site generator packing a punch}
-  spec.description   = %q{Yes yet another static site generator}
+  spec.summary       = %q{A tiny static site generator packing a punch - 静态网页生成器 Jing tai wang ye sheng cheng qi}
+  spec.description   = %q{Yes yet another static site generator. Has built in support for Erb - and Markdown templates, Typescript compiler, Sass compiler, JavaScript/Css minifier, partial- and layout support, variable support, easily extendable.}
   spec.homepage      = "https://github.com/pachacamac/jing"
   spec.license       = "MIT"
 
