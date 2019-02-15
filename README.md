@@ -61,9 +61,15 @@ Folders starting with `_` have special meaning, they generally won't get copied 
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+Extending is fairly easy.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+`@converters` variable in the initialize method holds a bunch of converters. Just add one in the spirit of the others. You can also do this on the fly when initiating the Jing Class by passing the `converter_addons` option.
+
+Class methods that end in a bang `!` automatically are registered as cli commands. If you wish to add a command just add a bang-method and you should be done.
+
+Feel free to open issues for questions / ideas etc that you don't know how to work on or have no time working on as well as actual bugs and quirky etc. I'm sure there are some.
+
+Please fork and make a pull request if you want to contribute.
 
 ## Contributing
 
