@@ -9,12 +9,14 @@ module Jing
     def initialize(opts={})
       @src = File.expand_path(opts[:src] || Dir.pwd)
       @dst = File.expand_path(opts[:dst] || File.join(@src, '_dst'))
+      @layouts = opts[:layouts] || '_layouts'
+      @partials = opts[:partials] || '_partials'
       @converters = (opts[:converter_addons] || []) + [
         {extensions: %w[erb], handler: Proc.new { |body, meta, ctx|
           ERB.new(body).result(OpenStruct.new(meta: meta).instance_eval { ctx })
         }},
         {extensions: %w[html htm], handler: Proc.new { |body, meta, ctx|
-          if meta[:layout] && layout = Dir[File.join(@src, '_layouts', "#{meta[:layout]}.*")].first
+          if meta[:layout] && layout = Dir[File.join(@src, @layouts, "#{meta[:layout]}.*")].first
             content = load_content(layout, meta)
             ERB.new(content[:body]).result(OpenStruct.new(meta: meta, body: body).instance_eval { ctx })
           else
@@ -48,8 +50,14 @@ module Jing
       gemfile { source(opts.delete(:source)||'https://rubygems.org'); gem(name, opts) }
     end
 
+    def active_exts(file)
+      File.basename(file).split('.').reverse.take_while{|e| @converter_extensions.include?(e)}
+    end
+
     def dstname(file, path=File.dirname(file))
-      File.join(path, File.basename(file).split('.', 3)[0..1].join('.'))
+      exts = active_exts(file).reverse
+      size = exts.size > 1 ? exts[1..-1].join('.').size+2 : 1
+      File.join(path, File.basename(file)[0..-size])
     end
 
     def load_content(file, meta={})
@@ -62,14 +70,14 @@ module Jing
 
     def render(file, meta={})
       if !File.file?(file)
-        file = Dir[File.join(@src, '_partials', "#{file}.*")].first
+        file = Dir[File.join(@src, @partials, "#{file}.*")].first
       else
         meta.merge!(file: file)
       end
       t = Time.now
       content = load_content(file, meta)
       body = content[:body]
-      File.basename(file).split('.')[1..-1].reverse.each do |ext|
+      active_exts(file).each do |ext|
         converter = @converters.find { |c| c[:extensions].include?(ext) }
         body = converter ? converter[:handler].call(body, content[:meta], binding) : body
       end
@@ -113,7 +121,7 @@ module Jing
 
     def create!(opts={})
       abort("usage: #{File.basename($0)} create -name <pathname>") unless opts[:name]
-      %w[_layouts _partials].each { |e| FileUtils.mkdir_p(File.join(opts[:name], e)) }
+      [@layouts, @partials].each { |e| FileUtils.mkdir_p(File.join(opts[:name], e)) }
       File.write(File.join(opts[:name], '.meta.yml'), "---\ngenerator: jing\nname: #{File.basename(opts[:name])}\n---\n")
     end
 
