@@ -31,7 +31,7 @@ module Jing
         }},
         {extensions: %w[js], handler: ->(body, meta, ctx){
           load_gem 'uglifier'
-          Uglifier.compile(body, harmony: true)
+          Uglifier.compile(body, harmony: true, output: {ascii_only: true})
         }},
         {extensions: %w[md markdown], handler: ->(body, meta, ctx){
           load_gem 'kramdown'
@@ -79,7 +79,7 @@ module Jing
       puts "Error\t#{file[@src.size+1..-1]}\n\t#{e.message}\n#{e.backtrace.map{|x| "\t#{x}"}.join("\n")}"
     end
 
-    def build!
+    def build!(opts={})
       t = Time.now
       FileUtils.rm_r(@dst) if File.exist?(@dst)
       Dir.mkdir(@dst)
@@ -95,24 +95,30 @@ module Jing
       puts "#{'%.4fs' % (Time.now-t)} total"
     end
 
-    def watch!
+    def watch!(opts={})
       @converter_extensions.delete('js')
-      build!
+      build!(opts)
       load_gem('filewatcher')
       Filewatcher.new([@src, '**', '*']).watch do |filename, event|
-        puts "WATCHED #{filename}\t#{event}"
-        build!
+        unless File.expand_path(filename) == @dst
+          puts "WATCHED #{filename}\t#{event}"
+          build!(opts)
+        end
       end
     end
 
-    def serve!
-      WEBrick::HTTPServer.new(Port: 8000, DocumentRoot: @dst).start
+    def serve!(opts={})
+      WEBrick::HTTPServer.new(Port: opts[:port] || 8000, DocumentRoot: opts[:root] || @dst).start
     end
 
-    def create!
-      abort("usage: #{File.basename($0)} create <name/path>") unless ARGV[1]
-      %w[_layouts _partials].each { |e| FileUtils.mkdir_p(File.join(ARGV[1], e)) }
-      File.write(File.join(ARGV[1], '.meta.yml'), "---\ngenerator: jing\nname: #{File.basename(ARGV[1])}\n---\n")
+    def create!(opts={})
+      abort("usage: #{File.basename($0)} create -name <pathname>") unless opts[:name]
+      %w[_layouts _partials].each { |e| FileUtils.mkdir_p(File.join(opts[:name], e)) }
+      File.write(File.join(opts[:name], '.meta.yml'), "---\ngenerator: jing\nname: #{File.basename(opts[:name])}\n---\n")
+    end
+
+    def version!(opts={})
+      puts VERSION
     end
   end
 
@@ -120,7 +126,8 @@ module Jing
     cmd = ARGV[0]
     commands = Jing.instance_methods(false).grep(/!$/).map{|e| e[0..-2]}
     abort("usage: #{File.basename($0)} <#{commands.join('|')}>") unless commands.include?(cmd)
-    jing = Jing.new()
-    jing.send(:"#{cmd}!")
+    opts = ARGV[1..-1].each_slice(2).reduce({}){|s,(k,v)| s[k.match(/^\-*(.*)$/)[1].to_sym] = v; s}
+    jing = Jing.new(opts)
+    jing.send(:"#{cmd}!", opts)
   end
 end
