@@ -11,6 +11,7 @@ module Jing
       @dst = File.expand_path(opts[:dst] || File.join(@src, '_dst'))
       @layouts = opts[:layouts] || '_layouts'
       @partials = opts[:partials] || '_partials'
+      @loaded_gems = {}
       @converters = (opts[:converter_addons] || []) + [
         {extensions: %w[erb], handler: Proc.new { |body, meta, ctx|
           ERB.new(body).result(OpenStruct.new(meta: meta).instance_eval { ctx })
@@ -23,7 +24,7 @@ module Jing
             ERB.new(body).result(OpenStruct.new(meta: meta).instance_eval { ctx })
           end
         }},
-        {extensions: %w[scss sass], handler: ->(body, meta, ctx){
+        {extensions: %w[scss sass css], handler: ->(body, meta, ctx){
           load_gem 'sassc'
           SassC::Engine.new(body, style: (meta[:style] || :compressed)).render
         }},
@@ -33,7 +34,7 @@ module Jing
         }},
         {extensions: %w[js], handler: ->(body, meta, ctx){
           load_gem 'uglifier'
-          Uglifier.compile(body, harmony: true, output: {ascii_only: true})
+          Uglifier.compile(body, harmony: true, compress: false, mangle: false, output: {ascii_only: true})
         }},
         {extensions: %w[md markdown], handler: ->(body, meta, ctx){
           load_gem 'kramdown'
@@ -47,7 +48,7 @@ module Jing
     end
 
     def load_gem(name, opts={})
-      gemfile { source(opts.delete(:source)||'https://rubygems.org'); gem(name, opts) }
+      @loaded_gems[name] ||= gemfile { source(opts.delete(:source)||'https://rubygems.org'); gem(name, opts) }
     end
 
     def active_exts(file)
@@ -77,11 +78,12 @@ module Jing
       t = Time.now
       content = load_content(file, meta)
       body = content[:body]
-      active_exts(file).each do |ext|
+      exts = active_exts(file)
+      exts.each do |ext|
         converter = @converters.find { |c| c[:extensions].include?(ext) }
         body = converter ? converter[:handler].call(body, content[:meta], binding) : body
       end
-      puts "#{'%.4fs' % (Time.now-t)}\t#{file[@src.size+1..-1]} => #{dstname(file, @dst)[@dst.size+1..-1]} (#{(body.size/1024.0).round(2)}kb)"
+      puts "#{'%.4fs' % (Time.now-t)}\t#{file[@src.size+1..-1]} >#{exts.join('>')}> #{dstname(file, @dst)[@dst.size+1..-1]} (#{(body.size/1024.0).round(2)}kb)"
       body
     rescue => e
       puts "Error\t#{file[@src.size+1..-1]}\n\t#{e.message}\n#{e.backtrace.map{|x| "\t#{x}"}.join("\n")}"
@@ -104,12 +106,13 @@ module Jing
     end
 
     def watch!(opts={})
-      @converter_extensions.delete('js')
+      @converters.delete_if{|e| e[:extensions]==['js']}
+      @converters<<{extensions: %w[js], handler: ->(body, meta, ctx){body}}
       build!(opts)
       load_gem('filewatcher')
       Filewatcher.new([@src, '**', '*']).watch do |filename, event|
         unless File.expand_path(filename) == @dst
-          puts "WATCHED #{filename}\t#{event}"
+          puts "\nWATCHED: #{filename}\t#{event}\t#{Time.now}"
           build!(opts)
         end
       end
@@ -122,7 +125,7 @@ module Jing
     def create!(opts={})
       abort("usage: #{File.basename($0)} create -name <pathname>") unless opts[:name]
       [@layouts, @partials].each { |e| FileUtils.mkdir_p(File.join(opts[:name], e)) }
-      File.write(File.join(opts[:name], '.meta.yml'), "---\ngenerator: jing\nname: #{File.basename(opts[:name])}\n---\n")
+      File.write(File.join(opts[:name], '.meta.yml'), "---\ngenerator: jing #{VERSION}\nname: #{File.basename(opts[:name])}\n---\n")
     end
 
     def version!(opts={})
