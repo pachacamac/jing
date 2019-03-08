@@ -50,6 +50,7 @@ Serves the current projects _dst folder on `http://0.0.0.0:8000`:
     $ jing serve -port 1234 -root somepath  # to change port and root directory
 
 Options that work in all commands:
+
     -src somepath     # changes the source folder - default: ./ (current folder)
     -dst somepath     # changes the output folder - default: ./_dst
     -layouts folder   # changes the layouts folder - default: ./_layouts
