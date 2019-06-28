@@ -7,7 +7,7 @@ Jing tai wang ye sheng cheng qi
 
 ---
 
-Has built in support for Erb - and Markdown templates, Typescript compiler, Sass compiler, JavaScript/Css minifier, partial- and layout support, variable support, easily extendable.
+Has built in support for Erb - and Markdown templates, Typescript compiler, Sass compiler, JavaScript/Css minifier, partial- and layout support, variable support, easily extendable, updates your page as soon as you change a file.
 
 ## Installation
 

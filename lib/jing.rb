@@ -57,6 +57,9 @@ module Jing
         },
         %w[md markdown] => ->(body, meta, ctx){
           Kramdown::Document.new(body).to_html
+        },
+	%w[xml txt] => ->(body, meta, ctx){
+          body
         }
       }
 
