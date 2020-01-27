@@ -87,6 +87,10 @@ Feel free to open issues for questions / ideas etc that you don't know how to wo
 
 Please fork and make a pull request if you want to contribute.
 
+## Examples
+
+Check out the examples folder, or [this repository](https://github.com/pachacamac/JingExampleSite) for a full fledged example that is directly deployable to netlify.
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/pachacamac/jing.
