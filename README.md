@@ -1,3 +1,6 @@
+
+Please consider using [pachacamac/sessg] instead. It should be considerably better than this one. Also this one is not further developed anymore.
+
 # Jing
 
 A tiny static site generator packing a punch
